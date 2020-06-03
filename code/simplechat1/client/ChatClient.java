@@ -1,6 +1,6 @@
 // This file contains material supporting section 3.7 of the textbook:
 // "Object Oriented Software Engineering" and is issued under the open-source
-// license found at www.lloseng.com 
+// license found at www.lloseng.com
 
 package client;
 
@@ -20,16 +20,16 @@ import java.io.*;
 public class ChatClient extends AbstractClient
 {
   //Instance variables **********************************************
-  
+
   /**
-   * The interface type variable.  It allows the implementation of 
+   * The interface type variable.  It allows the implementation of
    * the display method in the client.
    */
-  ChatIF clientUI; 
+  ChatIF clientUI;
 
-  
+
   //Constructors ****************************************************
-  
+
   /**
    * Constructs an instance of the chat client.
    *
@@ -37,50 +37,71 @@ public class ChatClient extends AbstractClient
    * @param port The port number to connect on.
    * @param clientUI The interface type variable.
    */
-  
-  public ChatClient(String host, int port, ChatIF clientUI) 
-    throws IOException 
+
+  public ChatClient(String host, int port, ChatIF clientUI)
+    throws IOException
   {
     super(host, port); //Call the superclass constructor
     this.clientUI = clientUI;
     openConnection();
   }
 
-  
+
   //Instance methods ************************************************
-    
+
   /**
    * This method handles all data that comes in from the server.
    *
    * @param msg The message from the server.
    */
-  public void handleMessageFromServer(Object msg) 
+  public void handleMessageFromServer(Object msg)
   {
     clientUI.display(msg.toString());
   }
 
   /**
-   * This method handles all data coming from the UI            
+   * This method handles all data coming from the UI
    *
-   * @param message The message from the UI.    
+   * @param message The message from the UI.
    */
   public void handleMessageFromClientUI(String message)
   {
     try
     {
+      if(message.substring(0,1) == "#"){
+        
+      }
+      )
       sendToServer(message);
     }
     catch(IOException e)
     {
       clientUI.display
-        ("Could not send message to server.  Terminating client.");
+        ("Error: Could not send message to server.  Terminating client.");
       quit();
     }
   }
-  
+
+  /** method called each time an exception is thrown by the client's
+   * thread that is waiting for messages from the server.
+   */
+  protected void connectionClosed() {
+    System.out.println("You have been Logged off! Have a good one!");
+ 	}
+
+  /**method called after a connection has been established. The default
+   * implementation does nothing. It may be overridden by subclasses to do
+   * anything they wish.
+   */
+  protected void connectionException(Exception exception) {
+    System.out.println("Error: Connection Lost, Try again later");
+    quit();
+	}
+
   /**
    * This method terminates the client.
    */
+
   public void quit()
   {
     try
