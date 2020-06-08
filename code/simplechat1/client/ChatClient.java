@@ -68,11 +68,13 @@ public class ChatClient extends AbstractClient
   {
     try
     {
-      if(message.substring(0,1) == "#"){
-        
-      }
-      )
+      if(message.substring(0,1).equals("#")){
+        handleClientCommand(message); //new command i made to handle the # commands to have the code clean
+      }else if(message == "logoff"){
+        closeConnection();
+      }else{
       sendToServer(message);
+    }
     }
     catch(IOException e)
     {
@@ -82,11 +84,64 @@ public class ChatClient extends AbstractClient
     }
   }
 
+  /** method called each time the user inputs a command using the key character "#"
+  *   this calls other commands such as setHost and others.
+  **/
+  public void handleClientCommand(String message) throws IOException{
+    String[] command = message.split(" ");
+    if(command[0].equals("#quit")){
+      quit();
+    }else if (command[0].equals("#sethost")){
+      if(isConnected()){
+        System.out.println("Error: You can't change hosts if you're already connected to hort " + getHost());
+      }else{
+        try{
+        setHost(command[1]);
+        System.out.println("You are now set to:"+ getHost());
+      }catch(Exception e){
+        System.out.println("Error: Invalid arguments. Try again.");
+      }
+    }
+    }else if (command[0].equals("#gethost")){
+      System.out.println("You're connected to host " + getHost());
+    }else if (command[0].equals("#setport")){
+      if(isConnected()){
+        System.out.println("Error: You can't change hosts if you're already connected to port " + getPort());
+      }else{
+        try{
+        setPort(Integer.parseInt(command[1]));
+        System.out.println("You are now set to:"+ getPort());
+      }catch(Exception e){
+        System.out.println("Error: Invalid arguments. Try again.");
+      }
+    }
+    }else if (command[0].equals("#getport")){
+      System.out.println("You're connected to port " + getPort());
+    }else if(command[0].equals("#login")){
+      if(isConnected()){
+        System.out.println("Error: You're already connected to "+getHost());
+      }else{
+        openConnection();
+        System.out.println("You have been reconnected to: "+ getHost()+ ", with the port: "+ getPort());
+      }
+    }else if(command[0].equals("#logoff")){
+      if(!isConnected()){
+        System.out.println("Error: You're already disconnected from all servers");
+      }else{
+        sendToServer("null");
+        closeConnection();
+      }
+    }else{
+      sendToServer(message);
+    }
+
+  }
+
   /** method called each time an exception is thrown by the client's
    * thread that is waiting for messages from the server.
    */
   protected void connectionClosed() {
-    System.out.println("You have been Logged off! Have a good one!");
+    System.out.println("You have been Logged off!");
  	}
 
   /**method called after a connection has been established. The default

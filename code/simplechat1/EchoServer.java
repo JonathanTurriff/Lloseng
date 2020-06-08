@@ -24,6 +24,10 @@ public class EchoServer extends AbstractServer
    */
   final public static int DEFAULT_PORT = 5555;
 
+  //I couldn't figure out how to determine if the server is closed or not because isClosed() isnt working so i just used booleans
+  private boolean stopped;
+  private boolean closed;
+
   //Constructors ****************************************************
 
   /**
@@ -34,6 +38,8 @@ public class EchoServer extends AbstractServer
   public EchoServer(int port)
   {
     super(port);
+    stopped = false;
+    closed = false;
   }
 
 
@@ -45,15 +51,81 @@ public class EchoServer extends AbstractServer
    * @param msg The message received from the client.
    * @param client The connection from which the message originated.
    */
-  public void handleMessageFromClient
-    (Object msg, ConnectionToClient client)
+  public void handleMessageFromClient(Object msg, ConnectionToClient client)
   {
-    if(msg ==  null){
-      clientDisconnected(client);
+    if(msg == null){
+      return;
     }else{
     System.out.println("Message received: " + msg + " from " + client);
     this.sendToAllClients(msg);
   }
+  }
+
+  /**
+   * This method handles any messages received from the Server Console.
+   *
+   * @param msg The message received from the client.
+   */
+  public void handleMessageFromServer(String msg ){
+    try{
+    if(msg.substring(0,1).equals("#")){
+      handleServerCommands(msg);//new command i made to handle the # commands to have the code clean
+    }else{
+      System.out.println("SERVER MSG> "+msg);
+      sendToAllClients("SERVER MSG> "+ msg);
+    }
+    }catch(IOException e){
+      System.out.println("Error: Could not send message to server.");
+
+    }
+  }
+
+  /**
+   * This method handles any command received from the Server Console.
+   *
+   * @param msg The message received from the client.
+   */
+  public void handleServerCommands(String message) throws IOException{
+
+    String[] command = message.split(" ");
+
+    if(command[0].equals("#quit")){
+      System.out.println("Closing ServerConsole...");
+      sendToAllClients("SERVER MSG> Server is closing...");
+      close();
+      System.exit(0);
+    }else if (command[0].equals("#stop")){
+      stopped = true;
+      stopListening();
+    }else if (command[0].equals("#close")){
+      sendToAllClients("SERVER MSG> Server is closing...");
+      System.out.println("Server is now closed.");
+      closed = true;
+      close();
+    }else if (command[0].equals("#setport")){
+      if(!closed){
+        System.out.println("Error: You can't change hosts if you're already connected to port " + getPort());
+      }else{
+        try{
+        setPort(Integer.parseInt(command[1]));
+        System.out.println("You are now set to:"+ getPort());
+      }catch(Exception e){
+        System.out.println("Error: Invalid arguments. Try again.");
+      }
+    }
+    }else if (command[0].equals("#getport")){
+      System.out.println("You're connected to host " + getPort());
+    }else if(command[0].equals("#start")){
+      if(stopped){
+        listen();
+        stopped = false;
+      }else{
+        System.out.println("Server is already started.");
+      }
+    }else{
+      System.out.println("SERVER MSG> "+message);
+      sendToAllClients("SERVER MSG> "+ message);
+    }
   }
 
   /**
@@ -78,22 +150,6 @@ public class EchoServer extends AbstractServer
 
   //Class methods ***************************************************
 
-  /**
-   * This method is responsible for the creation of
-   * the server instance (there is no UI in this phase).
-   *
-   * @param args[0] The port number to listen on.  Defaults to 5555
-   *          if no argument is entered.
-   */
-   /** Hook method called each time a client disconnects.
-   * The default implementation does nothing. The method
-   * may be overridden by subclasses but should remains synchronized.
-   *
-   * @param client the connection with the client.
-   **/
-  synchronized protected void clientDisconnected(ConnectionToClient client) {
-      System.out.println("Disconnected: "+ client);
-    }
 
   /**
    * Hook method called each time a new client connection is
@@ -104,32 +160,18 @@ public class EchoServer extends AbstractServer
     System.out.println("New Connection: "+ client);
   }
 
-
-
-
-  public static void main(String[] args)
-  {
-    int port = 0; //Port to listen on
-
-    try
-    {
-      port = Integer.parseInt(args[0]); //Get port from command line
+  /* Hook method called each time an exception is thrown in a
+  * ConnectionToClient thread.
+  * The method may be overridden by subclasses but should remains
+  * synchronized.
+  *
+  * @param client the client that raised the exception.
+  * @param Throwable the exception thrown.
+   */
+  synchronized protected void clientException(
+     ConnectionToClient client, Throwable exception) {
+       System.out.println("New Disconnection: "+ client);
     }
-    catch(Throwable t)
-    {
-      port = DEFAULT_PORT; //Set port to 5555
-    }
-
-    EchoServer sv = new EchoServer(port);
-
-    try
-    {
-      sv.listen(); //Start listening for connections
-    }
-    catch (Exception ex)
-    {
-      System.out.println("ERROR - Could not listen for clients!");
-    }
-  }
+//Got rid of Main in this class to implement it in ServerConsole.java
 }
 //End of EchoServer class
