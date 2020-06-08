@@ -1,0 +1,342 @@
+Name: Jonathan Turriff
+Student number: 300116124
+Email: JTurr031@uottawa.ca
+
+________________________________________________________________________
+Testcase 2001
+C:\Users\jonat\Projects\code\simplechat1>java ServerConsole
+Server listening for connections on port 5555
+
+
+________________________________________________________________________
+Testcase 2002
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole
+Error: No login ID specified.  Connection aborted.
+
+
+________________________________________________________________________
+Testcase 2003
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Jonathan
+Cannot open connection.  Awaiting command.
+
+
+________________________________________________________________________
+Testcase 2004
+Console CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ServerConsole
+Server listening for connections on port 5555
+New Connection: Jonathan
+New Connection: Alex
+
+Client1 CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Jonathan
+You are now connected to a server with the port: 5555
+> Jonathan Has Logged in.
+> Alex Has Logged in.
+
+Client2 CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Alex
+You are now connected to a server with the port: 5555
+> Alex Has Logged in.
+
+
+________________________________________________________________________
+Testcase 2005
+
+Client CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Jonathan
+You are now connected to a server with the port: 5555
+> Jonathan Has Logged in.
+hello
+> Jonathan: hello
+
+Server CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ServerConsole
+Server listening for connections on port 5555
+New Connection: Jonathan
+Message received: hello from 127.0.0.1 (127.0.0.1), loginID: Jonathan
+
+
+________________________________________________________________________
+Testcase 2006
+Console CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ServerConsole
+Server listening for connections on port 5555
+New Connection: Jonathan
+New Connection: Alex
+Message received: d from 127.0.0.1 (127.0.0.1), loginID: Alex
+Message received: a from 127.0.0.1 (127.0.0.1), loginID: Jonathan
+s
+SERVER MSG> s
+
+Client1 CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Jonathan
+You are now connected to a server with the port: 5555
+> Jonathan Has Logged in.
+> Alex Has Logged in.
+> Alex: d
+a
+> Jonathan: a
+> SERVER MSG> s
+
+Client2 CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Alex
+You are now connected to a server with the port: 5555
+> Alex Has Logged in.
+d
+> Alex: d
+> Jonathan: a
+> SERVER MSG> s
+
+
+________________________________________________________________________
+Testcase 2007
+C:\Users\jonat\Projects\code\simplechat1>java ServerConsole
+Server listening for connections on port 5555
+#quit
+Closing ServerConsole...
+
+C:\Users\jonat\Projects\code\simplechat1>
+
+
+________________________________________________________________________
+Testcase 2008
+Console CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ServerConsole
+Server listening for connections on port 5555
+New Connection: Jonathan
+#stop
+Server has stopped listening for connections.
+Message received: d from 127.0.0.1 (127.0.0.1), loginID: Jonathan
+
+Client1 CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Jonathan
+You are now connected to a server with the port: 5555
+> Jonathan Has Logged in.
+d
+> Jonathan: d
+
+Client2 CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Alex
+Cannot open connection.  Awaiting command.
+
+
+________________________________________________________________________
+Testcase 2009 part 1
+
+Console CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ServerConsole
+Server listening for connections on port 5555
+New Connection: Jonathan
+#stop
+Server has stopped listening for connections.
+#close
+Server is now closed.
+New Disconnection: Jonathan
+
+Client CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Jonathan
+You are now connected to a server with the port: 5555
+> Jonathan Has Logged in.
+> SERVER MSG> Server is closing...
+Error: Connection Lost, Awaiting input.
+
+________________________________________________________________________
+Testcase 2009 part 2
+
+Console CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ServerConsole
+Server listening for connections on port 5555
+New Connection: Jonathan
+#close
+Server is now closed.
+Server has stopped listening for connections.
+New Disconnection: Jonathan
+#start
+Server listening for connections on port 5555
+New Connection: Yellow
+New Disconnection: Yellow
+
+Client CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Jonathan
+You are now connected to a server with the port: 5555
+> Jonathan Has Logged in.
+> SERVER MSG> Server is closing...
+Error: Connection Lost, Awaiting command.
+#login Yellow
+> Yellow Has Logged in.
+
+
+________________________________________________________________________
+Testcase 2010
+
+Client CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Jonathan
+You are now connected to a server with the port: 5555
+> Jonathan Has Logged in.
+#quit
+You have been Logged off!
+
+
+________________________________________________________________________
+Testcase 2011
+
+Client CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Jonathan
+You are now connected to a server with the port: 5555
+> Jonathan Has Logged in.
+#logoff
+Connection closed.  (Under NT, it will display Abnormal termination of connection.)
+You have been Logged off!
+
+
+________________________________________________________________________
+Testcase 2012
+
+Client CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Jonathan
+Error: Cannot open connection.  Awaiting command.
+#setport 1234
+You are now set to: 1234
+#sethost <newhost>
+You are now set to: <newhost>
+#getport
+You're connected to port 1234
+#gethost
+You're connected to host <newhost>
+
+
+________________________________________________________________________
+Testcase 2013
+
+Console CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ServerConsole 1234
+Server listening for connections on port 1234
+
+
+________________________________________________________________________
+Testcase 2014
+
+Console CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ServerConsole 1234
+Server listening for connections on port 1234
+New Connection: Jonathan
+
+Client CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Jonathan localhost 1234
+You are now connected to a server with the port: 1234
+> Jonathan Has Logged in.
+
+________________________________________________________________________
+Testcase 2015
+
+Console CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ServerConsole
+Server listening for connections on port 5555
+New Connection: Alex
+New Connection: Jonathan
+Message received: hi from 127.0.0.1 (127.0.0.1), loginID: Jonathan
+Message received: hello from 127.0.0.1 (127.0.0.1), loginID: Alex
+#close
+Server is now closed.
+Server has stopped listening for connections.
+New Disconnection: Alex
+New Disconnection: Jonathan
+#setport 1234
+You are now set to: 1234
+#start
+Server listening for connections on port 1234
+New Connection: Yellow
+New Connection: Red
+Message received: d from 127.0.0.1 (127.0.0.1), loginID: Red
+Message received: a from 127.0.0.1 (127.0.0.1), loginID: Yellow
+#quit
+Closing ServerConsole...
+Server has stopped listening for connections.
+New Disconnection: Yellow
+New Disconnection: Red
+
+Client1 CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Jonathan
+You are now connected to a server with the port: 5555
+> Jonathan Has Logged in.
+hi
+> Jonathan: hi
+> Alex: hello
+> SERVER MSG> Server is closing...
+Error: Connection Lost, Awaiting command.
+#setport 1234
+You are now set to:1234
+#login Yellow
+> Yellow Has Logged in.
+> Red Has Logged in.
+> Red: d
+a
+> Yellow: a
+> SERVER MSG> Server is closing...
+Error: Connection Lost, Awaiting command.
+
+Client2 CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Alex
+You are now connected to a server with the port: 5555
+> Alex Has Logged in.
+> Jonathan Has Logged in.
+> Jonathan: hi
+hello
+> Alex: hello
+> SERVER MSG> Server is closing...
+Error: Connection Lost, Awaiting command.
+#setport 1234
+You are now set to:1234
+#login Red
+> Red Has Logged in.
+d
+> Red: d
+> Yellow: a
+> SERVER MSG> Server is closing...
+Error: Connection Lost, Awaiting command.
+
+________________________________________________________________________
+Testcase 2016, Testcase 2018, Testcase 2019
+//I do not have multiple platforms to make the tests
+
+
+________________________________________________________________________
+Testcase 2017
+
+Console CMD:
+C:\Users\jonat\Projects\code\simplechat1>Java ServerConsole
+Server listening for connections on port 5555
+New Connection: Julian
+New Connection: Jonathan
+New Connection: Alex
+AlexHas disconnected.
+Message received: null from 127.0.0.1 (127.0.0.1), loginID: Julian
+Julian Has disconnected.
+
+Client2 CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Jonathan
+> Jonathan Has Logged in.
+> Alex Has Logged in.
+> New Disconnection: Alex
+> Julian: null
+> New Disconnection: Julian
+
+Client2 CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Julian
+> Julian Has Logged in.
+> Jonathan Has Logged in.
+> Alex Has Logged in.
+> New Disconnection: Alex
+#logoff
+Connection closed.  (Under NT, it will display Abnormal termination of connection.)
+
+Client3 CMD:
+C:\Users\jonat\Projects\code\simplechat1>java ClientConsole Alex
+> Alex Has Logged in.
+#quit
+You have been Logged off!
+
+
+
+

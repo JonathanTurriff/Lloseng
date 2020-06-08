@@ -7,7 +7,7 @@ import client.*;
 import common.*;
 
 /**
- * This class constructs the UI for a chat client.  It implements the
+ * This class constructs the UI for a server console.  It implements the
  * chat interface in order to activate the display() method.
  * Warning: Some of the code here is cloned in ServerConsole
  *
@@ -16,21 +16,20 @@ import common.*;
  * @author Dr Robert Lagani&egrave;re
  * @version July 2000
  */
-public class ClientConsole implements ChatIF
-{
+ public class ServerConsole implements ChatIF{
   //Class variables *************************************************
 
   /**
    * The default port to connect on.
    */
   final public static int DEFAULT_PORT = 5555;
-
+  // Thought i could get rid of this but i needed it to implement ChatIF
   //Instance variables **********************************************
 
   /**
    * The instance of the client that created this ConsoleChat.
    */
-  ChatClient client;
+  EchoServer server;
 
 
   //Constructors ****************************************************
@@ -41,17 +40,8 @@ public class ClientConsole implements ChatIF
    * @param host The host to connect to.
    * @param port The port to connect on.
    */
-  public ClientConsole(String host, int port, String loginID)
-  {
-    try
-    {
-      client= new ChatClient(host, port, this, loginID);
-    }
-    catch(IOException exception)
-    {
-      System.out.println("Cannot open connection.  Awaiting command.");
-
-    }
+  public ServerConsole(EchoServer server){
+    this.server = server;
   }
 
 
@@ -71,7 +61,7 @@ public class ClientConsole implements ChatIF
       while (true)
       {
         message = fromConsole.readLine();
-        client.handleMessageFromClientUI(message);
+        server.handleMessageFromServer(message);
       }
     }
     catch (Exception ex)
@@ -100,41 +90,33 @@ public class ClientConsole implements ChatIF
    *
    * @param args[0] The host to connect to.
    */
-  public static void main(String[] args)
-  {
-    String host = "";
-    int port = 0;  //The port number
-    String loginID = "";
-    try
-    {
-       loginID = args[0] ; //Get loginid from command line
-    }
-    catch(Throwable t)
-    {
-      System.out.println("Error: No login ID specified.  Connection aborted.");
-      System.exit(0);
-    }
+   public static void main(String[] args)
+   {
+     int port = 0; //Port to listen on
 
-    try
-    {
-      port = Integer.parseInt(args[2]); //Get port from command line
-    }
-    catch(ArrayIndexOutOfBoundsException e)
+     try
+     {
+       port = Integer.parseInt(args[0]); //Get port from command line
+     }
+     catch(Throwable t)
+     {
+       port = DEFAULT_PORT; //Set port to 5555
+     }
+     //initialises the things nessesary for the ServerUI
+     EchoServer serv = new EchoServer(port);
+     ServerConsole chat = new ServerConsole(serv);
+     try
+     {
+       serv.listen(); //Start listening for connections
+     }
+     catch (Exception ex)
+     {
+       System.out.println("ERROR - Could not listen for clients!");
+     }
+     //lets the user chat with the console
+     chat.accept();
 
-    {
-      port = DEFAULT_PORT; //Set port to 5555
-    }
+   }
+ //of ServerConsole class
 
-    try
-    {
-      host = args[3]; //Get HostName from command line
-    }
-    catch(ArrayIndexOutOfBoundsException e)
-    {
-      host = "localhost"; //sets as default
-    }
-    ClientConsole chat= new ClientConsole(host, port, loginID);
-    chat.accept();  //Wait for console data
-  }
 }
-//End of ConsoleChat class

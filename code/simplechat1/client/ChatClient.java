@@ -1,6 +1,6 @@
 // This file contains material supporting section 3.7 of the textbook:
 // "Object Oriented Software Engineering" and is issued under the open-source
-// license found at www.lloseng.com 
+// license found at www.lloseng.com
 
 package client;
 
@@ -20,16 +20,18 @@ import java.io.*;
 public class ChatClient extends AbstractClient
 {
   //Instance variables **********************************************
-  
+
   /**
-   * The interface type variable.  It allows the implementation of 
+   * The interface type variable.  It allows the implementation of
    * the display method in the client.
    */
-  ChatIF clientUI; 
+  ChatIF clientUI;
 
-  
+  //stores the loginID
+  private String loginID;
+
   //Constructors ****************************************************
-  
+
   /**
    * Constructs an instance of the chat client.
    *
@@ -37,50 +39,131 @@ public class ChatClient extends AbstractClient
    * @param port The port number to connect on.
    * @param clientUI The interface type variable.
    */
-  
-  public ChatClient(String host, int port, ChatIF clientUI) 
-    throws IOException 
+
+  public ChatClient(String host, int port, ChatIF clientUI, String loginID)
+    throws IOException
   {
     super(host, port); //Call the superclass constructor
     this.clientUI = clientUI;
-    openConnection();
+    this.loginID = loginID;
+    try{
+      openConnection();
+      sendToServer("#login "+loginID);
+    }catch(IOException e){
+      System.out.println("Error: Cannot open connection.  Awaiting command.");
+    }
+
   }
 
-  
   //Instance methods ************************************************
-    
+
   /**
    * This method handles all data that comes in from the server.
    *
    * @param msg The message from the server.
    */
-  public void handleMessageFromServer(Object msg) 
+  public void handleMessageFromServer(Object msg)
   {
     clientUI.display(msg.toString());
   }
 
   /**
-   * This method handles all data coming from the UI            
+   * This method handles all data coming from the UI
    *
-   * @param message The message from the UI.    
+   * @param message The message from the UI.
    */
   public void handleMessageFromClientUI(String message)
   {
     try
     {
+      if(message.substring(0,1).equals("#")){
+        handleClientCommand(message); //new command i made to handle the # commands to have the code clean
+      }else if(message == "logoff"){
+        closeConnection();
+      }else{
       sendToServer(message);
+    }
     }
     catch(IOException e)
     {
       clientUI.display
-        ("Could not send message to server.  Terminating client.");
-      quit();
+        ("Error: Could not send message to server.  Try again later.");
     }
   }
-  
+
+  /** method called each time the user inputs a command using the key character "#"
+  *   this calls other commands such as setHost and others.
+  **/
+  public void handleClientCommand(String message) throws IOException{
+    String[] command = message.split(" ");
+    if(command[0].equals("#quit")){
+      quit();
+    }else if (command[0].equals("#sethost")){
+      if(isConnected()){
+        System.out.println("Error: You can't change hosts if you're already connected to hort " + getHost());
+      }else{
+        try{
+        setHost(command[1]);
+        System.out.println("You are now set to: "+ getHost());
+      }catch(Exception e){
+        System.out.println("Error: Invalid arguments. Try again.");
+      }
+    }
+    }else if (command[0].equals("#gethost")){
+      System.out.println("You're connected to host " + getHost());
+    }else if (command[0].equals("#setport")){
+      if(isConnected()){
+        System.out.println("Error: You can't change hosts if you're already connected to port " + getPort());
+      }else{
+        try{
+        setPort(Integer.parseInt(command[1]));
+        System.out.println("You are now set to: "+ getPort());
+      }catch(Exception e){
+        System.out.println("Error: Invalid arguments. Try again.");
+      }
+    }
+  }else if(command[0].equals("#login")){
+    if(isConnected()){
+      sendToServer(message);
+    }else{
+      openConnection();
+      sendToServer(message);
+    }
+  }else if (command[0].equals("#getport")){
+      System.out.println("You're connected to port " + getPort());
+    }else if(command[0].equals("#logoff")){
+      if(!isConnected()){
+        System.out.println("Error: You're already disconnected from all servers");
+      }else{
+      System.out.println("Connection closed.  (Under NT, it will display Abnormal termination of connection.)");
+        sendToServer("null");
+        closeConnection();
+      }
+    }else{
+      sendToServer(message);
+    }
+
+  }
+
+  /** method called each time an exception is thrown by the client's
+   * thread that is waiting for messages from the server.
+   */
+  protected void connectionClosed() {
+    System.out.println("You have been Logged off!");
+ 	}
+
+  /**method called after a connection has been established. The default
+   * implementation does nothing. It may be overridden by subclasses to do
+   * anything they wish.
+   */
+  protected void connectionException(Exception exception) {
+    System.out.println("Error: Connection Lost, Awaiting command.");
+	}
+
   /**
    * This method terminates the client.
    */
+
   public void quit()
   {
     try
