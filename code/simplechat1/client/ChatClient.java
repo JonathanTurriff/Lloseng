@@ -27,6 +27,8 @@ public class ChatClient extends AbstractClient
    */
   ChatIF clientUI;
 
+  //stores the loginID
+  private String loginID;
 
   //Constructors ****************************************************
 
@@ -38,14 +40,20 @@ public class ChatClient extends AbstractClient
    * @param clientUI The interface type variable.
    */
 
-  public ChatClient(String host, int port, ChatIF clientUI)
+  public ChatClient(String host, int port, ChatIF clientUI, String loginID)
     throws IOException
   {
     super(host, port); //Call the superclass constructor
     this.clientUI = clientUI;
-    openConnection();
-  }
+    this.loginID = loginID;
+    try{
+      openConnection();
+      sendToServer("#login "+loginID);
+    }catch(IOException e){
+      System.out.println("Error: Cannot open connection.  Awaiting command.");
+    }
 
+  }
 
   //Instance methods ************************************************
 
@@ -79,8 +87,7 @@ public class ChatClient extends AbstractClient
     catch(IOException e)
     {
       clientUI.display
-        ("Error: Could not send message to server.  Terminating client.");
-      quit();
+        ("Error: Could not send message to server.  Try again later.");
     }
   }
 
@@ -97,7 +104,7 @@ public class ChatClient extends AbstractClient
       }else{
         try{
         setHost(command[1]);
-        System.out.println("You are now set to:"+ getHost());
+        System.out.println("You are now set to: "+ getHost());
       }catch(Exception e){
         System.out.println("Error: Invalid arguments. Try again.");
       }
@@ -110,24 +117,25 @@ public class ChatClient extends AbstractClient
       }else{
         try{
         setPort(Integer.parseInt(command[1]));
-        System.out.println("You are now set to:"+ getPort());
+        System.out.println("You are now set to: "+ getPort());
       }catch(Exception e){
         System.out.println("Error: Invalid arguments. Try again.");
       }
     }
-    }else if (command[0].equals("#getport")){
+  }else if(command[0].equals("#login")){
+    if(isConnected()){
+      sendToServer(message);
+    }else{
+      openConnection();
+      sendToServer(message);
+    }
+  }else if (command[0].equals("#getport")){
       System.out.println("You're connected to port " + getPort());
-    }else if(command[0].equals("#login")){
-      if(isConnected()){
-        System.out.println("Error: You're already connected to "+getHost());
-      }else{
-        openConnection();
-        System.out.println("You have been reconnected to: "+ getHost()+ ", with the port: "+ getPort());
-      }
     }else if(command[0].equals("#logoff")){
       if(!isConnected()){
         System.out.println("Error: You're already disconnected from all servers");
       }else{
+      System.out.println("Connection closed.  (Under NT, it will display Abnormal termination of connection.)");
         sendToServer("null");
         closeConnection();
       }
@@ -149,8 +157,7 @@ public class ChatClient extends AbstractClient
    * anything they wish.
    */
   protected void connectionException(Exception exception) {
-    System.out.println("Error: Connection Lost, Try again later");
-    quit();
+    System.out.println("Error: Connection Lost, Awaiting command.");
 	}
 
   /**
